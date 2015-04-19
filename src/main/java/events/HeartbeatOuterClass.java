@@ -789,7 +789,7 @@ public final class HeartbeatOuterClass {
 
       private events.Uuid.UUID controlMessageIdentifier_ = events.Uuid.UUID.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          events.Uuid.UUID, events.Uuid.UUID.Builder, events.Uuid.UUIDOrBuilder> controlMessageIdentifierBuilder_;
+          Uuid.UUID, Uuid.UUID.Builder, Uuid.UUIDOrBuilder> controlMessageIdentifierBuilder_;
       /**
        * <code>optional .events.UUID controlMessageIdentifier = 4;</code>
        *
@@ -926,11 +926,11 @@ public final class HeartbeatOuterClass {
        * </pre>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          events.Uuid.UUID, events.Uuid.UUID.Builder, events.Uuid.UUIDOrBuilder>
+          Uuid.UUID, Uuid.UUID.Builder, Uuid.UUIDOrBuilder>
           getControlMessageIdentifierFieldBuilder() {
         if (controlMessageIdentifierBuilder_ == null) {
           controlMessageIdentifierBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              events.Uuid.UUID, events.Uuid.UUID.Builder, events.Uuid.UUIDOrBuilder>(
+              Uuid.UUID, Uuid.UUID.Builder, Uuid.UUIDOrBuilder>(
                   getControlMessageIdentifier(),
                   getParentForChildren(),
                   isClean());

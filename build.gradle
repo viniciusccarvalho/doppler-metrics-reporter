@@ -22,7 +22,8 @@ task wrapper(type: Wrapper) {
 dependencies {
     compile("io.dropwizard.metrics:metrics-core:3.1.0") 
     compile("com.google.protobuf:protobuf-java:2.6.1")
-    testCompile("org.springframework.boot:spring-boot-starter-test")
+    compile("io.netty:netty-all:5.0.0.Alpha2")
+    testCompile("junit:junit:4.12")
 }
 
 version = '1.0.0.BUILD-SNAPSHOT'
