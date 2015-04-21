@@ -6,6 +6,8 @@ import io.pivotal.cloudfoundry.metrics.Signer;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.UUID;
+
 /**
  * Created by vcarvalho on 4/18/15.
  */
@@ -19,6 +21,8 @@ public class SignerTest {
 
         byte[] signed = signer.encrypt(envelope.toByteArray());
         Assert.assertEquals(envelope.getOrigin(), EnvelopeOuterClass.Envelope.parseFrom(signer.decrypt(signed)).getOrigin());
-        
+
     }
+
+
 }

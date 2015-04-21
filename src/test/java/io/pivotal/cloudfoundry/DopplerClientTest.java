@@ -2,40 +2,22 @@ package io.pivotal.cloudfoundry;
 
 import events.EnvelopeOuterClass;
 import events.Metric;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.socket.DatagramPacket;
 import io.pivotal.cloudfoundry.metrics.DopplerClient;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Created by vcarvalho on 4/17/15.
+ * Created by vcarvalho on 4/20/15.
  */
-
-public class DopplerServerTest {
-
-    private static DopplerServer server;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception{
-        Thread t1 = new Thread(new DopplerServer());
-        t1.start();
-    }
+public class DopplerClientTest {
 
     @Test
-    public void sendMetric() throws Exception{
-        DopplerClient client = new DopplerClient("localhost",3453,"cl0udc0w");
+    public void publishCustomMetric() throws Exception{
+        DopplerClient client = new DopplerClient("10.68.105.28",3457,"c3887abea2f85c823456");
         EnvelopeOuterClass.Envelope envelope = EnvelopeOuterClass.Envelope.newBuilder().setOrigin("localhost").setEventType(EnvelopeOuterClass.Envelope.EventType.ValueMetric).setTimestamp(System.currentTimeMillis())
                 .setValueMetric(Metric.ValueMetric.newBuilder().setValue(1.0).setName("name").setUnit("P")).build();
-        for(int i=0;i<10;i++) {
+        for(int i=0;i<1000;i++) {
             client.publish(envelope);
             Thread.sleep(100L);
         }
-
     }
-
-
-
-
 }
