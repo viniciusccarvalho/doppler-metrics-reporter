@@ -2,8 +2,11 @@ package io.pivotal.cloudfoundry.metrics;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -13,24 +16,37 @@ import java.util.Arrays;
  */
 public class Signer {
 
-    private final SecretKeySpec keySpec;
+    private SecretKeySpec keySpec;
+    private Mac hmac;
 
     public Signer(String secret){
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(secret.getBytes());
-            this.keySpec = new SecretKeySpec(Arrays.copyOf(hash,16),"AES");
+            this.hmac = Mac.getInstance("HmacSHA256");
+            this.keySpec = new SecretKeySpec(secret.getBytes("UTF-8"),"HmacSHA256");
+            this.hmac.init(keySpec);
         } catch (NoSuchAlgorithmException e) {
            throw new IllegalStateException("Could not create digest instance");
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
 
     }
     public byte[] decrypt(byte[] input){
         byte[] decrypted = null;
         try {
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE,keySpec);
-            decrypted = cipher.doFinal(input);
+            byte[] message = new byte[input.length-32];
+            System.arraycopy(input,32,message,0,message.length);
+            byte[] expected = hmac.doFinal(message);
+            byte[] current = new byte[32];
+            System.arraycopy(input,0,current,0,32);
+            if(!Arrays.equals(expected,current)){
+                throw new RuntimeException("Invalid HMAC signature");
+            }
+            decrypted = new byte[input.length-32];
+            System.arraycopy(input,32,decrypted,0,input.length-32);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -40,9 +56,10 @@ public class Signer {
     public byte[] encrypt(byte[] input){
         byte[] encrypted = null;
         try {
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE,keySpec);
-            encrypted = cipher.doFinal(input);
+            byte[] signature = hmac.doFinal(input);
+            encrypted = new byte[input.length+signature.length];
+            System.arraycopy(signature,0,encrypted,0,signature.length);
+            System.arraycopy(input,0,encrypted,signature.length,input.length);
         } catch (Exception e) {
             e.printStackTrace();
         }
