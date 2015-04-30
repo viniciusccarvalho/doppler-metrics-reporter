@@ -1,19 +1,14 @@
-package io.pivotal.cloudfoundry;
+package io.pivotal.cloudfoundry.metrics.server;
 
-import com.google.common.primitives.UnsignedLong;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoop;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoop;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import io.pivotal.cloudfoundry.metrics.DopplerReporter;
+import io.pivotal.cloudfoundry.metrics.Signer;
 
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by vcarvalho on 4/17/15.
@@ -23,12 +18,15 @@ public class DopplerServer implements Runnable{
 
     private Bootstrap b;
     private EventLoopGroup group;
-    public DopplerServer() {
+    private int port;
+
+    public DopplerServer(Signer signer, int port) {
         this.group = new NioEventLoopGroup();
         this.b = new Bootstrap();
+        this.port = port;
         this.b.group(group)
                 .channel(NioDatagramChannel.class)
-                .handler(new DropsOndeProtocolHandler())
+                .handler(new DropsOndeProtocolHandler(signer,true))
                 .option(ChannelOption.SO_BROADCAST, false)
                 ;
     }
@@ -38,14 +36,17 @@ public class DopplerServer implements Runnable{
 
     @Override
     public void run() {
-        //8ed236b2-b267-4f1b-b558-5b593581465e
         try {
-            b.bind(new InetSocketAddress(3453)).sync().channel().closeFuture().await();
+            b.bind(new InetSocketAddress(port)).sync().channel().closeFuture().await();
         } catch (InterruptedException e) {
             e.printStackTrace();
             group.shutdownGracefully();
         } finally {
 
         }
+    }
+
+    public void shutdown(){
+        this.group.shutdownGracefully();
     }
 }

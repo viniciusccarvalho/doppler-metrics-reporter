@@ -59,25 +59,6 @@ public class DopplerClient {
         }
     }
 
-    public static void main(String[] args) {
-        String host = args[0];
-        Integer port = Integer.parseInt(args[1]);
-        String secret = args[2];
-        Integer messages = args[3] == null ? 50 : Integer.parseInt(args[3]);
-        DopplerClient client = new DopplerClient(host,port,secret);
-        Random r = new Random();
 
-        for(int i=0;i<messages;i++){
-            EnvelopeOuterClass.Envelope envelope = EnvelopeOuterClass.Envelope.newBuilder().setOrigin("sample-test").setTimestamp(System.currentTimeMillis()).setEventType(EnvelopeOuterClass.Envelope.EventType.ValueMetric).setValueMetric(Metric.ValueMetric.newBuilder().setUnit("count").setName("random").setValue(r.nextDouble()*100)).build();
-            client.publish(envelope);
-            try {
-                Thread.sleep(20L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-    }
 
 }

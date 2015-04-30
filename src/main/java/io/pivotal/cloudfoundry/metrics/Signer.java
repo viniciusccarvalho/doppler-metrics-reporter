@@ -17,18 +17,11 @@ import java.util.Arrays;
 public class Signer {
 
     private SecretKeySpec keySpec;
-    private Mac hmac;
 
     public Signer(String secret){
         try {
-            this.hmac = Mac.getInstance("HmacSHA256");
             this.keySpec = new SecretKeySpec(secret.getBytes("UTF-8"),"HmacSHA256");
-            this.hmac.init(keySpec);
-        } catch (NoSuchAlgorithmException e) {
-           throw new IllegalStateException("Could not create digest instance");
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
+        }  catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
@@ -36,6 +29,8 @@ public class Signer {
     public byte[] decrypt(byte[] input){
         byte[] decrypted = null;
         try {
+            Mac hmac = Mac.getInstance("HmacSHA256");
+            hmac.init(this.keySpec);
             byte[] message = new byte[input.length-32];
             System.arraycopy(input,32,message,0,message.length);
             byte[] expected = hmac.doFinal(message);
@@ -56,6 +51,8 @@ public class Signer {
     public byte[] encrypt(byte[] input){
         byte[] encrypted = null;
         try {
+            Mac hmac = Mac.getInstance("HmacSHA256");
+            hmac.init(this.keySpec);
             byte[] signature = hmac.doFinal(input);
             encrypted = new byte[input.length+signature.length];
             System.arraycopy(signature,0,encrypted,0,signature.length);

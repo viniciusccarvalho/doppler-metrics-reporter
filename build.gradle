@@ -34,7 +34,9 @@ dependencies {
     compile("com.google.protobuf:protobuf-java:2.6.1")
     compile("com.google.guava:guava:18.0")
     compile("io.netty:netty-all:5.0.0.Alpha2")
+    compile("commons-codec:commons-codec:1.10")
     testCompile("junit:junit:4.12")
+    testCompile("com.codahale.metrics:metrics-jvm:3.0.1")
 }
 
 version = '1.0.0.BUILD-SNAPSHOT'
