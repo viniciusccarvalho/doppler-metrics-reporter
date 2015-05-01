@@ -44,6 +44,7 @@ public class DopplerClient {
             channel = bootstrap.bind(new InetSocketAddress(0)).sync().channel();
             byte[] signedData = signer.encrypt(envelope.toByteArray());
             channel.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(signedData),new InetSocketAddress(host,port))).sync();
+            channel.close();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

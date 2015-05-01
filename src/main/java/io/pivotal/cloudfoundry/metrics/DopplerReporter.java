@@ -98,11 +98,37 @@ public class DopplerReporter extends ScheduledReporter {
 
     @Override
     public void report(SortedMap<String, Gauge> gauges, SortedMap<String, Counter> counters, SortedMap<String, Histogram> histograms, SortedMap<String, Meter> meters, SortedMap<String, Timer> timers) {
+
         for(Map.Entry<String, Gauge> entry : gauges.entrySet()){
             reportGauge(entry.getKey(),entry.getValue());
         }
+
+        for(Map.Entry<String,Counter> entry : counters.entrySet()){
+            reportCounter(entry.getKey(), entry.getValue());
+        }
+
+        for(Map.Entry<String,Meter> entry : meters.entrySet()){
+            reportMeter(entry.getKey(),entry.getValue());
+        }
+
+
+
     }
 
+
+    private void reportMeter(String name, Meter meter){
+
+    }
+
+    private void reportCounter(String name, Counter counter){
+        try {
+            Envelope envelope = Envelope.newBuilder().setEventType(Envelope.EventType.CounterEvent).setOrigin(origin).setTimestamp(clock.getTime())
+                                .setCounterEvent(Metric.CounterEvent.newBuilder().setName(name).setTotal(counter.getCount()).build()).build();
+            client.publish(envelope);
+        }catch (Exception e){
+            logger.error(String.format("Error reporting Counter %s ", name), e);
+        }
+    }
 
     private void reportGauge(String name, Gauge gauge){
         if(!Number.class.isAssignableFrom(gauge.getValue().getClass())){
@@ -114,7 +140,7 @@ public class DopplerReporter extends ScheduledReporter {
                    .setValueMetric(Metric.ValueMetric.newBuilder().setValue(Double.valueOf(gauge.getValue().toString())).setName(name).setUnit("count").build()).build();
            client.publish(envelope);
        }catch (Exception e){
-           e.printStackTrace();
+           logger.error(String.format("Error reporting Gauge %s ", name), e);
        }
     }
 
